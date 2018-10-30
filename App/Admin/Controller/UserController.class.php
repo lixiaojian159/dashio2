@@ -4,7 +4,7 @@
  * @Author: 李健
  * @Date:   2018-10-26 16:46:24
  * @Last Modified by:   lijian
- * @Last Modified time: 2018-10-29 22:05:41
+ * @Last Modified time: 2018-10-30 20:32:35
  * @E-mail: 852688838@qq.com
  * @Tel: 18633899381
  */
@@ -33,6 +33,11 @@ class UserController extends BaseController{
 		$users_model = M('users');
 		$start = ($page_local -1) * $page_num;
 		$users = $users_model->where('route != 1')->limit($start.','.$page_num)->select();
+		foreach($users as $key => $val){
+			if($users[$key]['logintime'] != ''){
+				$users[$key]['logintime'] = date("Y-m-d H:i:s",$users[$key]['logintime']);
+			}
+		}
 		$arr['code'] = 1;
 		$arr['msg']  = 'success';
 		$arr['data'] = $users;

@@ -164,9 +164,11 @@
                             $str += "<td>" + val.keycode + "</td>";
                             $str += "<td>" + val.email + "</td>";
                             $str += "<td>" + val.logintime + "</td>";
+                            $str += "<td>";
                             if(val.name == ''){
-                            $str += '<td><button class="btn btn-danger btn-xs del" data-id="' + val.id + '"><i class="fa fa-trash-o "></i></button></td>';
+                            $str += '<button class="btn btn-danger btn-xs del" data-id="' + val.id + '"><i class="fa fa-trash-o "></i></button>';
                             }
+                            $str += "</td>";
                             $str += "</tr>";
                         })
                         $('#infolist').append($str);
