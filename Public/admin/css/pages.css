@@ -1,0 +1,21 @@
+/*
+* @Author: 李健
+* @Date:   2018-10-29 15:18:15
+* @Last Modified by:   banana
+* @Last Modified time: 2018-10-29 15:25:15
+*/
+.pager span {
+    background: #4ecdc4;
+    color: #fff;
+    border: 1px solid #4ecdc4;
+    padding: 3px 10px;
+    margin-left: 8px;
+}
+.pager a {
+    border: 1px solid #666666;
+    padding: 3px 10px;
+    margin-left: 8px;
+    text-decoration: none;
+    color: #333;
+    outline: none;
+}

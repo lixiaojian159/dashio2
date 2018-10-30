@@ -1,0 +1,203 @@
+<!--
+* @Author: 李健
+* @Date:   2018-10-26 16:49:50
+* @Last Modified by:   banana
+* @Last Modified time: 2018-10-30 09:36:38
+* @E-mail: 852688838@qq.com
+* @Tel: 18633899381
+-->
+<extend name="Layouts:layouts" />
+<block name="main">
+	<div class="row mt">
+        <div class="col-lg-4 col-md-6 col-sm-10">
+        	<div class="showback">
+                <h4><i class="fa fa-angle-right"></i> 授权</h4>
+                <button type="button" class="btn btn-default" id="keyCode">生成开户码</button>
+                <button type="button" class="btn btn-success" id="success">确定</button>
+                <div style="margin-top: 20px">
+                    <form role="form" class="form-horizontal style-form">
+                        <div class="form-group has-success">
+                          <div class="col-lg-8">
+                            <input type="text" placeholder="自动生成开户授权码" id="key" readonly class="form-control" style="text-align: center">
+                          </div>
+                        </div>
+                    </form>
+                </div>
+            </div>  
+        </div>
+    </div>
+
+     <!-- row -->
+        <div class="row mt">
+          <div class="col-md-12">
+            <div class="content-panel">
+              <table class="table table-striped table-advance table-hover">
+                <h4><i class="fa fa-angle-right"></i> 开户授权码</h4>
+                <hr>
+                <thead>
+                  <tr>
+                    <th><i class="fa fa-bullhorn"></i> ID</th>
+                    <th class="hidden-phone"><i class="fa fa-question-circle"></i> 用户名</th>
+                    <th><i class="fa fa-bookmark"></i> 授权码</th>
+                    <th><i class=" fa fa-edit"></i> 邮箱</th>
+                    <th><i class=" fa fa-edit"></i> 注册时间</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="infolist">
+                    
+                </tbody>
+              </table>
+            </div>
+            <!-- /content-panel -->
+          </div>
+          <!-- /col-md-12 -->
+        </div>
+        <div id="page"></div>
+
+<script>
+    //生成7位随机字符串作为授权码
+    $("#keyCode").click(function(){
+        var keyCode = _getRandomString(7);
+        $("#key").val(keyCode);
+    })
+
+    //异步请求: 把授权码保存到users
+    $("#success").click(function(){
+        var keyCode = $("#key").val();
+        var url  = "{:U('Admin/User/createKeyCode')}";
+        var data = {'keycode':keyCode};
+        $.post(url,data,function(result){
+            if(result.code){
+                layui.use('layer', function(){
+                    var layer = layui.layer;
+                    layer.open({
+                        title: '授权码'
+                        ,content: result.msg
+                        ,icon:6
+                        , yes: function(index, layero){
+                            //do something
+                            layer.close(index); //如果设定了yes回调，需进行手工关闭
+                            window.location.href = result.url;
+                        }
+                    });
+                });
+            }else{
+                layui.use('layer', function(){
+                    var layer = layui.layer;
+                    layer.open({
+                        title: '授权码'
+                        ,content: result.msg
+                        ,icon:5
+                        , yes: function(index, layero){
+                            //do something
+                            layer.close(index); //如果设定了yes回调，需进行手工关闭
+                            window.location.href = result.url;
+                        }
+                    });
+                });
+            }
+        },'JSON')
+    })
+    
+    //异步申请:删除未注册成功的授权码(在tp的模版中便利数据的时候可以使用,)
+    $(".del").click(function(){
+        var id   = $(this).attr('data-id');
+        var url  = "{:U('Admin/User/delkeyCode')}";
+        var data = {'id':id};
+        $.post(url,data,function(result){
+            if(result.code){
+                layui.use('layer', function(){
+                    var layer = layui.layer;
+                    layer.open({
+                        title: '删除授权码'
+                        ,content: result.msg
+                        ,icon:6
+                        , yes: function(index, layero){
+                            //do something
+                            layer.close(index); //如果设定了yes回调，需进行手工关闭
+                            window.location.href = result.url;
+                        }
+                    });
+                });
+            }
+        },'JSON')
+    })
+
+    //获取长度为len的随机字符串
+    function _getRandomString(len) {
+        var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678'; // 默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1
+        var maxPos = $chars.length;
+        var pwd = '';
+        for (i = 0; i < len; i++) {
+            pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+        }
+        return pwd;
+    }
+
+    //分页layui
+    layui.use('laypage', function(){
+        var laypage = layui.laypage;
+        var count   = '{$count}'; //总共条数
+      
+        //执行一个laypage实例
+        laypage.render({
+            elem: 'page' //注意，这里的 test1 是 ID，不用加 # 号
+            ,count: count //数据总数，从服务端得到
+            ,limit: 10 //每页显示的条数
+            ,jump: function(obj, first){
+                //obj包含了当前分页的所有参数，比如：
+                //console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
+                //console.log(obj.limit); //得到每页显示的条数
+                var data = {'page_local':obj.curr,'page_num':obj.limit};
+                var url  = "{:U('Admin/User/getUsers')}";
+                $.post(url,data,function(result){
+                    if(result.code){
+                        var data2 = result.data;
+                        //console.log(data2);
+                        $("#infolist").html('');
+                        $str = "";
+                        $.each(data2,function(i,val){
+                            $str += "<tr>";
+                            $str += "<td>" + val.id + "</td>";
+                            $str += "<td>" + val.name + "</td>";
+                            $str += "<td>" + val.keycode + "</td>";
+                            $str += "<td>" + val.email + "</td>";
+                            $str += "<td>" + val.logintime + "</td>";
+                            if(val.name == ''){
+                            $str += '<td><button class="btn btn-danger btn-xs del" data-id="' + val.id + '"><i class="fa fa-trash-o "></i></button></td>';
+                            }
+                            $str += "</tr>";
+                        })
+                        $('#infolist').append($str);
+                    }
+                },'JSON');
+            }
+        });
+    });
+
+    $("#infolist").on("click","button",function(){
+        //console.log(this);
+        var id   = $(this).attr("data-id");
+        var data = {'id':id};
+        var url  = "{:U('Admin/User/delkeyCode')}";
+        $.post(url,data,function(result){
+            if(result.code){
+                layui.use('layer', function(){
+                    var layer = layui.layer;
+                    layer.open({
+                        title: '删除授权码'
+                        ,content: result.msg
+                        ,icon:6
+                        , yes: function(index, layero){
+                            //do something
+                            layer.close(index); //如果设定了yes回调，需进行手工关闭
+                            window.location.href = result.url;
+                        }
+                    });
+                });
+            }
+        },'JSON')
+    })
+</script>
+</block>
