@@ -20,6 +20,7 @@ class IndexController extends Controller {
         }
     }
 
+    //验证登陆
     public function successpass(){
     	$name     = I('post.name');
     	$password = I('post.password');
@@ -47,6 +48,7 @@ class IndexController extends Controller {
     		echo json_encode($info);
     		exit;
     	}
+
     	//检测用户密码
     	if($user['password'] != md5($password.$user['salt'])){
     		$info['code'] = 0;
@@ -55,6 +57,16 @@ class IndexController extends Controller {
     		echo json_encode($info);
     		exit;
     	}
+
+
+        //判断是否是软删除账户
+        if($user['del'] == 1){
+            $info['code'] = 0;
+            $info['msg']  = "此账户已注销!!!";
+            $info['url']  = U("Admin/Index/index");
+            echo json_encode($info);
+            exit;
+        }
 
     	//验证成功保存session和cookie, 用于是否登陆后操作的验证
     	cookie('user_id',$user['id']);

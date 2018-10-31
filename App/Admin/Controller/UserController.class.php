@@ -3,8 +3,8 @@
 /**
  * @Author: 李健
  * @Date:   2018-10-26 16:46:24
- * @Last Modified by:   lijian
- * @Last Modified time: 2018-10-30 20:32:35
+ * @Last Modified by:   banana
+ * @Last Modified time: 2018-10-31 16:42:06
  * @E-mail: 852688838@qq.com
  * @Tel: 18633899381
  */
@@ -70,6 +70,14 @@ class UserController extends BaseController{
 			$arr['url']  = U('Admin/User/index');
 			echo json_encode($arr);
 		}
+	}
+
+
+	//账户列表
+	public function list(){
+		$title = "账户列表";
+		$this->assign('title',$title);
+		$this->display();
 	}
 
 }
