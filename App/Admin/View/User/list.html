@@ -2,7 +2,7 @@
 * @Author: 李健
 * @Date:   2018-10-31 16:38:28
 * @Last Modified by:   banana
-* @Last Modified time: 2018-10-31 17:02:16
+* @Last Modified time: 2018-11-01 14:45:03
 * @E-mail: 852688838@qq.com
 * @Tel: 18633899381
 -->
@@ -19,82 +19,32 @@
         <thead>
           <tr>
             <th><i class="fa fa-bullhorn"></i> ID</th>
-            <th class="hidden-phone"><i class="fa fa-question-circle"></i> 账户名称</th>
-            <th><i class="fa fa-bookmark"></i> 邮箱</th>
-            <th><i class=" fa fa-edit"></i> 注册时间</th>
+            <th class="hidden-phone"><i class="fa fa-user"></i> 账户名称</th>
+            <th><i class="fa fa-envelope"></i> 邮箱</th>
+            <th><i class=" fa fa-calendar"></i> 注册时间</th>
+            <th><i class=" fa fa-edit"></i> 状态</th>
             <th><i class=" fa fa-cog"></i> 操作</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>
-              <a href="basic_table.html#">Company Ltd</a>
-            </td>
-            <td class="hidden-phone">Lorem Ipsum dolor</td>
-            <td>12000.00$ </td>
-            <td><span class="label label-info label-mini">Due</span></td>
-            <td>
-              <button class="btn btn-success btn-xs"><i class="fa fa-check"></i></button>
-              <button class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i></button>
-              <button class="btn btn-danger btn-xs"><i class="fa fa-trash-o "></i></button>
-            </td>
-          </tr>
+        <tbody id="infolist">
+
+         <!--  <foreach name="users" item="user">
           <tr>
             <td>
               <a href="basic_table.html#">
-                Dashio co
-                </a>
+                {$user.id}
+              </a>
             </td>
-            <td class="hidden-phone">Lorem Ipsum dolor</td>
-            <td>17900.00$ </td>
-            <td><span class="label label-warning label-mini">Due</span></td>
+            <td class="hidden-phone">{$user.name}</td>
+            <td>{$user.email}</td>
+            <td><span class="label label-warning label-mini">{$user.logintime|date="Y-m-d H:i:s",###}</span></td>
             <td>
               <button class="btn btn-success btn-xs"><i class="fa fa-check"></i></button>
               <button class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i></button>
               <button class="btn btn-danger btn-xs"><i class="fa fa-trash-o "></i></button>
             </td>
           </tr>
-          <tr>
-            <td>
-              <a href="basic_table.html#">
-                Another Co
-                </a>
-            </td>
-            <td class="hidden-phone">Lorem Ipsum dolor</td>
-            <td>14400.00$ </td>
-            <td><span class="label label-success label-mini">Paid</span></td>
-            <td>
-              <button class="btn btn-success btn-xs"><i class="fa fa-check"></i></button>
-              <button class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i></button>
-              <button class="btn btn-danger btn-xs"><i class="fa fa-trash-o "></i></button>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a href="basic_table.html#">Dashio ext</a>
-            </td>
-            <td class="hidden-phone">Lorem Ipsum dolor</td>
-            <td>22000.50$ </td>
-            <td><span class="label label-success label-mini">Paid</span></td>
-            <td>
-              <button class="btn btn-success btn-xs"><i class="fa fa-check"></i></button>
-              <button class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i></button>
-              <button class="btn btn-danger btn-xs"><i class="fa fa-trash-o "></i></button>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a href="basic_table.html#">Total Ltd</a>
-            </td>
-            <td class="hidden-phone">Lorem Ipsum dolor</td>
-            <td>12120.00$ </td>
-            <td><span class="label label-warning label-mini">Due</span></td>
-            <td>
-              <button class="btn btn-success btn-xs"><i class="fa fa-check"></i></button>
-              <button class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i></button>
-              <button class="btn btn-danger btn-xs"><i class="fa fa-trash-o "></i></button>
-            </td>
-          </tr>
+          </foreach> -->
         </tbody>
       </table>
     </div>
@@ -103,4 +53,88 @@
   <!-- /col-md-12 -->
 </div>
 <!-- /row -->
+<!--分页-->
+<div id="demo1"></div>
+<!--/分页-->
+<script>
+  layui.use(['laypage', 'layer'], function(){
+    var laypage = layui.laypage,layer = layui.layer;
+
+    //总页数大于页码总数
+    laypage.render({
+      elem: 'demo1'
+      ,count: {$user_num} //数据总数
+      ,limit: 12 
+      ,jump: function(obj){
+        //console.log(obj);
+        //console.log(obj.curr);
+        //console.log(obj.count);
+        var url  = "{:U('admin/User/getGeneralLists')}";
+        var data = {'page_local':obj.curr,'page_limit':obj.limit};
+        //console.log(data);
+        $.post(url,data,function(result){
+          if(result.code){
+            var data2 = result.data;
+            $("#infolist").html("");
+            var str = '';
+            $.each(data2,function(i,val){
+              str += "<tr>";
+              str += "<td>" + val.id   + "</td>";
+              str += "<td>" + val.name + "</td>";
+              str += "<td>" + val.email + "</td>";
+              str += "<td>" + val.logintime + "</td>";
+              if(val.del == 1){
+                str += '<td><span class="label label-danger label-mini">停用</span></td>';
+              }else{
+                str += '<td><span class="label label-success label-mini">开启<span></td>';
+              }
+              str += '<td>';
+              if(val.del == 1){
+                str += ' <button class="btn btn-success btn-xs" data-action="open" data-id="'+val.id+'"><i class="fa fa-check"></i></button> ';
+              }
+              if(val.del == 0){
+                str += ' <button class="btn btn-danger btn-xs" data-action="del" data-id="'+val.id+'"><i class="fa fa-trash-o"></i></button> ';
+              }
+              str += ' <button class="btn btn-primary btn-xs" data-action="update" data-id="'+val.id+'"><i class="fa fa-pencil"></i></button> ';
+              str += '</td>';
+              str += "</tr>";
+            });
+            // console.log(str);
+            $("#infolist").append(str);
+          }
+        },'JSON'); 
+      }
+    });
+  })
+
+  $("#infolist").on('click','button',function(){
+    var id = $(this).attr('data-id');
+    var action = $(this).attr('data-action');
+    var data = {'id':id};
+    if(action == 'del'){
+      var url = "{:U('admin/User/del')}";
+    }else if(action == 'update'){
+      var url = "{:U('admin/User/update')}";
+    }else if(action == 'open'){
+      var url = "{:U('admin/User/open')}";
+    }
+    $.post(url,data,function(result){
+      if(result.code){
+        layui.use('layer', function(){
+          var layer = layui.layer;
+          layer.open({
+            title:'操作结果',
+            content: result.msg,
+            icon:6,
+            yes: function(index, layero){
+              //do something
+              layer.close(index); //如果设定了yes回调，需进行手工关闭
+              window.location.href = result.url;
+            }
+          })
+        })
+      }
+    },'JSON')
+  })
+</script>
 </block>

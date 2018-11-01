@@ -4,7 +4,7 @@
  * @Author: 李健
  * @Date:   2018-10-24 11:38:09
  * @Last Modified by:   banana
- * @Last Modified time: 2018-11-01 10:12:46
+ * @Last Modified time: 2018-11-01 11:13:20
  * @E-mail: 852688838@qq.com
  * @Tel: 18633899381
  */
@@ -102,6 +102,25 @@ class UsersModel extends Model{
 		}else{
 			return true;
 		}
+	}
+
+    /**
+     * [getGeneralUsers 获取所有已开户的账户]
+     * @return [array]  二维数组
+     */
+	public function getGeneralUsers($page_local,$page_num){
+		$start = ($page_local - 1) * $page_num;
+		$data['route'] = '0';
+		$data['keycode'] = '';
+		$users = $this->db->where($data)->limit($start,$page_num)->select();
+		return $users;
+	}
+
+	public function getGeneralUsersNum(){
+		$data['route'] = '0';
+		$data['keycode'] = '';
+		$num = $this->db->where($data)->count();
+		return $num;
 	}
 
 }
