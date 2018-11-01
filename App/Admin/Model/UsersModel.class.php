@@ -4,7 +4,7 @@
  * @Author: 李健
  * @Date:   2018-10-24 11:38:09
  * @Last Modified by:   banana
- * @Last Modified time: 2018-10-29 11:22:04
+ * @Last Modified time: 2018-11-01 10:12:46
  * @E-mail: 852688838@qq.com
  * @Tel: 18633899381
  */
@@ -74,6 +74,11 @@ class UsersModel extends Model{
 		return $user[0]['id'];
 	}
 
+	/**
+	 * [getByEmail 通过邮箱,判断是否邮箱已存在]
+	 * @param  [string]    $email   邮箱
+	 * @return [boolean]   存在：false ; 不存在：true   
+	 */
 	public function getByEmail($email){
 		$data['email'] = $email;
 		$user = $this->db->where($data)->find();
@@ -84,6 +89,11 @@ class UsersModel extends Model{
 		}
 	}
 
+    /**
+     * [getByName 通过账户,判断账户是否已存在]
+     * @param  [string]   $name 账户名
+     * @return [boolean]  存在:false ; 不存在: true
+     */
 	public function getByName($name){
 		$data['name'] = $name;
 		$user = $this->db->where($data)->find();
